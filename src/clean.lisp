@@ -16,6 +16,9 @@
      (dolist (item (xtree:all-childs node))
        (clean item mode)))
     (:xml-text-node node)
+    (:xml-cdata-section-node
+     (xtree:replace-child node
+                          (xtree:make-text (xtree:text-content node))))
     (:xml-comment-node
      (cond
        ((mode-allow-comments mode) node)
@@ -23,6 +26,8 @@
     (:xml-element-node
      (clean-element node mode))
     (otherwise
+     (print (xtree:node-type node))
+     (print (xtree:text-content node))
      (xtree:remove-child node))))
 
 (defun clean-element (element mode
@@ -31,19 +36,18 @@
     (clean node mode))
 
   (unless (element-allowed-p mode tagname)
-    (let ((fragment (xtree:make-document-fragment)))
+    (let ((w (whitespace-element-p mode tagname)))
+      (when w
+        (xtree:insert-child-before (xtree:make-text " ") element))
+
       (dolist (node (xtree:all-childs element))
-        (xtree:append-child fragment
-                            (xtree:detach node)))
+        (xtree:insert-child-before (xtree:detach node) element))
       
-      (when (whitespace-element-p mode tagname)
-        (xtree:prepend-child fragment
-                             (xtree:make-text " "))
-        (xtree:append-child fragment
-                            (xtree:make-text " ")))
+      (when w
+        (xtree:insert-child-before (xtree:make-text " ") element))
       
-      (xtree:replace-child element fragment)
-      (return-from clean-element fragment)))
+      (xtree:remove-child element)
+      (return-from clean-element)))
     
   (dolist (attr (xtree:all-attribute-nodes element))
     (unless (attribute-allowed-p mode tagname (xtree:local-name attr))
