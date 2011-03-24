@@ -7,5 +7,7 @@
            #:+default+
            #:+basic+
            #:+relaxed+
-           #:+restricted+))
+           #:+restricted+
+
+           #:clean))
 

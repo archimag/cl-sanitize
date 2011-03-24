@@ -3,23 +3,71 @@
 (in-package #:sanitize)
 
 (defclass sanitize-mode ()
-  ((allow-comments :initarg :allow-comments :reader mode-allow-comments)
-   (add-attributes :initarg :add-attributes :reader mode-add-attributes)
-   (attributes :initarg :attributes :reader mode-attributes)
-   (elemetns :initarg :elements :reader mode-elements)
-   (output-format :initarg :output-format :reader mode-output-format)
-   (protocols :initarg :protocols :reader mode-protocols)
-   (whitespace-elements :initarg :whitespace-elements :reader mode-whitespace-elements)))
+  ((allow-comments :initform nil
+                   :initarg :allow-comments
+                   :reader mode-allow-comments)
+   
+   (add-attributes :initform nil
+                   :initarg :add-attributes
+                   :reader mode-add-attributes)
+   
+   (attributes :initform nil
+               :initarg :attributes
+               :reader mode-attributes)
+   
+   (elemetns :initform nil
+             :initarg :elements
+             :reader mode-elements)
+   
+   (output-format :initform :html
+                  :initarg :output-format
+                  :reader mode-output-format)
+                  
+   (protocols :initform nil
+              :initarg :protocols
+              :reader mode-protocols)
+   
+   (whitespace-elements :initarg :whitespace-elements
+                        :reader mode-whitespace-elements
+                        :initform nil)))
 
-(defmacro define-sanitize-mode (name &key inherit
-                                allow-comments
-                                add-attributes
-                                attributes
-                                elements
-                                output-format
-                                protocols
-                                whitespace-elements)
-  (declare (ignore inherit))
+(defmethod shared-initialize :after ((mode sanitize-mode) slot-names &key &allow-other-keys)
+  (unless (mode-output-format mode)
+    (setf (slot-value mode 'output-format)
+          :html))
+
+  (unless (mode-whitespace-elements mode)
+    (setf (slot-value mode 'whitespace-elements)
+          (list "address" "article" "aside" "blockquote" "br" "dd" "div" "dl"
+                "dt" "footer" "h1" "h2" "h3" "h4" "h5" "h6" "header" "hgroup"
+                "hr" "li" "nav" "ol" "p" "pre" "section" "ul"))))
+
+(defun element-allowed-p (mode tagname)
+  (member tagname
+          (mode-elements mode)
+          :test #'string-equal))
+
+(defun attribute-allowed-p (mode tagname attrname)
+  (member attrname
+          (cdr (assoc tagname
+                      (mode-attributes mode)
+                      :test #'string-equal))
+          :test #'string-equal))
+
+(defun whitespace-element-p (mode tagname)
+  (member tagname
+          (mode-whitespace-elements mode)
+          :test #'string-equal))
+
+(defun element-additional-attributes (mode tagname)
+  (cdr (assoc tagname
+              (mode-add-attributes mode)
+              :test #'string-equal)))
+              
+
+(defmacro define-sanitize-mode (name &key
+                                allow-comments add-attributes attributes elements
+                                output-format protocols whitespace-elements)
   `(defparameter ,name
      (make-instance 'sanitize-mode
                     :allow-comments ',allow-comments
@@ -30,23 +78,12 @@
                     :protocols ',protocols
                     :whitespace-elements ',whitespace-elements)))
 
-(define-sanitize-mode +default+
-    :allow-comments nil
-    :add-attributes nil
-    :attributes nil
-    :elements #()
-    :output-format :html
-    :protocols nil
-    :whitespace-elements #(("address" "article" "aside" "blockquote" "br" "dd" "div" "dl" "dt" "footer"
-                            "h1" "h2" "h3" "h4" "h5" "h6" "header" "hgroup" "hr" "li" "nav" "ol" "p" "pre"
-                            "section" "ul")))
+(define-sanitize-mode +default+)
 
 (define-sanitize-mode +basic+
-    :inherit +default+
-    
-    :elements #("a" "abbr" "b" "blockquote" "br" "cite" "code" "dd" "dfn" "dl" "dt" "em" "i"
-                "kbd" "li" "mark" "ol" "p" "pre" "q" "s" "samp" "small" "strike" "strong"
-                "sub" "sup" "time" "u" "ul" "var")
+    :elements ("a" "abbr" "b" "blockquote" "br" "cite" "code" "dd" "dfn" "dl" "dt" "em" "i"
+               "kbd" "li" "mark" "ol" "p" "pre" "q" "s" "samp" "small" "strike" "strong"
+               "sub" "sup" "time" "u" "ul" "var")
 
     :attributes (("a"          . ("href"))
                  ("abbr"       . ("title"))
@@ -63,13 +100,11 @@
 
 
 (define-sanitize-mode +relaxed+
-    :inherit +default+
-    
-    :elements #("a" "abbr" "b" "bdo" "blockquote" "br" "caption" "cite" "code" "col"
-                "colgroup" "dd" "del" "dfn" "dl" "dt" "em" "figcaption" "figure" "h1" "h2"
-                "h3" "h4" "h5" "h6" "hgroup" "i" "img" "ins" "kbd" "li" "mark" "ol" "p" "pre"
-                "q" "rp" "rt" "ruby" "s" "samp" "small" "strike" "strong" "sub" "sup" "table"
-                "tbody" "td" "tfoot" "th" "thead" "time" "tr" "u" "ul" "var" "wbr")
+    :elements ("a" "abbr" "b" "bdo" "blockquote" "br" "caption" "cite" "code" "col"
+               "colgroup" "dd" "del" "dfn" "dl" "dt" "em" "figcaption" "figure" "h1" "h2"
+               "h3" "h4" "h5" "h6" "hgroup" "i" "img" "ins" "kbd" "li" "mark" "ol" "p" "pre"
+               "q" "rp" "rt" "ruby" "s" "samp" "small" "strike" "strong" "sub" "sup" "table"
+               "tbody" "td" "tfoot" "th" "thead" "time" "tr" "u" "ul" "var" "wbr")
     
     :attributes ((:all         . ("dir" "lang" "title"))
                  ("a"          . ("href"))
@@ -95,6 +130,5 @@
                 ("q"           . (("cite" . ("http" "https" :relative))))))
 
 (define-sanitize-mode +restricted+
-    :inherit +default+
-    :elements #("b" "em" "i" "strong" "u"))
+    :elements ("b" "em" "i" "strong" "u"))
  
