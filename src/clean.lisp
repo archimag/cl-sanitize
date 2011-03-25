@@ -19,7 +19,7 @@
         (clean-node fragment mode)
         (html:serialize-html fragment :to-string)))))
 
-(defmethod clean-node ((node xtree:node) mode)
+(defun clean-node (node mode)
   (case (xtree:node-type node)
     (:xml-document-fragment-node
      (dolist (item (xtree:all-childs node))
