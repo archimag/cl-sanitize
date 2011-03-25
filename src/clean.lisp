@@ -77,18 +77,4 @@
   (dolist (attr/value (element-additional-attributes mode tagname))
     (setf (xtree:attribute-value element (car attr/value))
           (cdr attr/value))))
-
-      
-      
-
-    
-     
-
-  
-
-
-
-    
-    
-  
-
+ 
