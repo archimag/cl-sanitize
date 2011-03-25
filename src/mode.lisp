@@ -49,9 +49,12 @@
 
 (defun attribute-allowed-p (mode tagname attrname)
   (member attrname
-          (cdr (assoc tagname
-                      (mode-attributes mode)
-                      :test #'string-equal))
+          (concatenate 'list
+                       (cdr (assoc tagname
+                                   (mode-attributes mode)
+                                   :test #'string-equal))
+                       (cdr (assoc :all
+                                   (mode-attributes mode))))
           :test #'string-equal))
 
 (defun whitespace-element-p (mode tagname)
@@ -63,7 +66,11 @@
   (cdr (assoc tagname
               (mode-add-attributes mode)
               :test #'string-equal)))
-              
+
+(defun element-protocols (mode tagname)
+  (cdr (assoc tagname
+              (mode-protocols mode)
+              :test #'string-equal)))
 
 (defmacro define-sanitize-mode (name &key
                                 allow-comments add-attributes attributes elements
@@ -94,9 +101,9 @@
 
     :add-attributes (("a" . (("rel" . "nofollow"))))
 
-    :protocols (("a"           . (("href" . ("ftp" "http" "https" "mailto" :relative))))
-                ("blockquote"  . (("cite" . ("http" "https" :relative))))
-                ("q"           . (("cite" . ("http" "https" :relative))))))
+    :protocols (("a"           . (("href" . (:ftp :http :https :mailto :relative))))
+                ("blockquote"  . (("cite" . (:http :https :relative))))
+                ("q"           . (("cite" . (:http :https :relative))))))
 
 
 (define-sanitize-mode +relaxed+
@@ -122,12 +129,12 @@
                  ("time"       . ("datetime" "pubdate"))
                  ("ul"         . ("type")))
 
-    :protocols (("a"           . (("href" . ("ftp" "http" "https" "mailto" :relative))))
-                ("blockquote"  . (("cite" . ("http" "https" :relative))))
-                ("del"         . (("cite" . ("http" "https" :relative))))
-                ("img"         . (("src"  . ("http" "https" :relative))))
-                ("ins"         . (("cite" . ("http" "https" :relative))))
-                ("q"           . (("cite" . ("http" "https" :relative))))))
+    :protocols (("a"           . (("href" . (:ftp :http :https :mailto :relative))))
+                ("blockquote"  . (("cite" . (:http :https :relative))))
+                ("del"         . (("cite" . (:http :https :relative))))
+                ("img"         . (("src"  . (:http :https :relative))))
+                ("ins"         . (("cite" . (:http :https :relative))))
+                ("q"           . (("cite" . (:http :https :relative))))))
 
 (define-sanitize-mode +restricted+
     :elements ("b" "em" "i" "strong" "u"))
