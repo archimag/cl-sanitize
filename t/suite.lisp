@@ -1,4 +1,10 @@
 ;;;; suite.lisp
+;;;;
+;;;; This file is part of the cl-sanitize library, released under Lisp-LGPL.
+;;;; See file COPYING for details.
+;;;;
+;;;; Author: Moskvitin Andrey <archimag@gmail.com>
+
 
 (defpackage #:sanitize.test
   (:use #:cl #:sanitize #:eos)
@@ -466,5 +472,3 @@
                "foo bar baz"))
   (is (string= (clean "foo<hr>bar<hr>baz")
                "foo bar baz")))
-
-  
