@@ -35,8 +35,6 @@
     (:xml-element-node
      (clean-element node mode))
     (otherwise
-     (print (xtree:node-type node))
-     (print (xtree:text-content node))
      (xtree:remove-child node))))
 
 (defun clean-element (element mode
