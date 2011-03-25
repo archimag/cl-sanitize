@@ -4,9 +4,15 @@
   :depends-on (#:cl-libxml2)
   :components ((:module "src"
                         :components
-                        ((:file "packages")
-                         (:file "mode" :depends-on ("packages"))
-                         (:file "clean" :depends-on ("mode"))))))
+                        ((:file "package")
+                         (:file "mode" :depends-on ("package"))
+                         (:file "clean" :depends-on ("mode"))
+                         (:module "modes"
+                                  :components
+                                  ((:file "basic")
+                                   (:file "relaxed")
+                                   (:file "restricted"))
+                                  :depends-on ("mode"))))))
 
 (defsystem #:sanitize-test
   :depends-on (#:sanitize #:eos)
