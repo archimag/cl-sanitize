@@ -8,16 +8,23 @@
 
 (in-package #:sanitize)
 
+(defmacro with-clean-fragment ((fragment html mode) &body body)
+  (let ((doc (gensym))
+        (entry (gensym))
+        (item (gensym)))
+    `(html:with-parse-html (,doc (format nil "<div>~A</div>" ,html))
+       (let ((,entry (xtree:first-child (xtree:first-child (xtree:root ,doc)))))
+         (xtree:with-object (,fragment (xtree:make-document-fragment ,doc))
+           (dolist (,item (xtree:all-childs ,entry))
+             (xtree:append-child ,fragment
+                                 (xtree:detach ,item)))
+           (clean-node ,fragment ,mode)
+           ,@body)))))
+
 (defun clean (html &optional (mode +default+))
   "Return sanitize copy of HTML"
-  (html:with-parse-html (doc (format nil "<div>~A</div>" html))
-    (let ((entry (xtree:first-child (xtree:first-child (xtree:root doc)))))
-      (xtree:with-object (fragment (xtree:make-document-fragment doc))
-        (dolist (item (xtree:all-childs entry))
-          (xtree:append-child fragment
-                              (xtree:detach item)))
-        (clean-node fragment mode)
-        (html:serialize-html fragment :to-string)))))
+  (with-clean-fragment (fragment html mode)
+    (html:serialize-html fragment :to-string)))
 
 (defun clean-node (node mode)
   (case (xtree:node-type node)

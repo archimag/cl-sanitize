@@ -14,5 +14,6 @@
            #:+relaxed+
            #:+restricted+
 
+           #:with-clean-fragment
            #:clean))
 
