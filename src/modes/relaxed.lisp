@@ -15,7 +15,7 @@
                "q" "rp" "rt" "ruby" "s" "samp" "small" "strike" "strong" "sub" "sup" "table"
                "tbody" "td" "tfoot" "th" "thead" "time" "tr" "u" "ul" "var" "wbr")
     
-    :attributes ((:all         . ("dir" "lang" "title"))
+    :attributes ((:all         . ("dir" "lang" "title" "class"))
                  ("a"          . ("href"))
                  ("blockquote" . ("cite"))
                  ("col"        . ("span" "width"))
