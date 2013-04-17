@@ -13,7 +13,7 @@
                "colgroup" "dd" "del" "dfn" "dl" "dt" "em" "figcaption" "figure" "h1" "h2"
                "h3" "h4" "h5" "h6" "hgroup" "i" "img" "ins" "kbd" "li" "mark" "ol" "p" "pre"
                "q" "rp" "rt" "ruby" "s" "samp" "small" "strike" "strong" "sub" "sup" "table"
-               "tbody" "td" "tfoot" "th" "thead" "time" "tr" "u" "ul" "var" "wbr")
+               "tbody" "td" "tfoot" "th" "thead" "time" "tr" "u" "ul" "var" "wbr" "font")
     
     :attributes ((:all         . ("dir" "lang" "title" "class"))
                  ("a"          . ("href"))
@@ -29,7 +29,8 @@
                  ("td"         . ("abbr" "axis" "colspan" "rowspan" "width"))
                  ("th"         . ("abbr" "axis" "colspan" "rowspan" "scope" "width"))
                  ("time"       . ("datetime" "pubdate"))
-                 ("ul"         . ("type")))
+                 ("ul"         . ("type"))
+                 ("font"       . ("size")))
 
     :protocols (("a"           . (("href" . (:ftp :http :https :mailto :relative))))
                 ("blockquote"  . (("cite" . (:http :https :relative))))
