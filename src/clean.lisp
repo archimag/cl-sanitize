@@ -40,12 +40,15 @@
        ((mode-allow-comments mode) node)
        (t (xtree:remove-child node))))
     (:xml-element-node
-     (clean-element node mode))
+     (let ((tagname (xtree:local-name node)))
+       (if (element-removed-p mode tagname)
+           (xtree:remove-child node)
+           (clean-element node mode tagname))))
     (otherwise
      (xtree:remove-child node))))
 
 (defun clean-element (element mode
-                      &aux (tagname (xtree:local-name element)))
+                      &optional (tagname (xtree:local-name element)))
   (dolist (node (xtree:all-childs element))
     (clean-node node mode))
 
@@ -57,13 +60,13 @@
 
       (dolist (node child)
         (xtree:insert-child-before (xtree:detach node) element))
-      
+
       (when (and w child)
         (xtree:insert-child-before (xtree:make-text " ") element))
-      
+
       (xtree:remove-child element)
       (return-from clean-element)))
-    
+
   (dolist (attr (xtree:all-attribute-nodes element))
     (unless (attribute-allowed-p mode tagname (xtree:local-name attr))
       (xtree:remove-child attr)))
@@ -78,8 +81,7 @@
                                                    :relative)
                                                protocols))))
           (xtree:remove-child attr)))))
-          
+
   (dolist (attr/value (element-additional-attributes mode tagname))
     (setf (xtree:attribute-value element (car attr/value))
           (cdr attr/value))))
- 
