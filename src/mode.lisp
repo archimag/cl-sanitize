@@ -22,7 +22,7 @@
    (attributes          :initform nil
                         :initarg :attributes
                         :reader mode-attributes)
-   (elemetns            :initform nil
+   (elements            :initform nil
                         :initarg :elements
                         :reader mode-elements)
    (protocols           :initform nil
@@ -30,7 +30,10 @@
                         :reader mode-protocols)
    (whitespace-elements :initform nil
                         :initarg :whitespace-elements
-                        :reader mode-whitespace-elements)))
+                        :reader mode-whitespace-elements)
+   (remove-elements     :initform nil
+                        :initarg :remove-elements
+                        :reader mode-remove-elements)))
 
 (defmethod shared-initialize :after ((mode sanitize-mode) slot-names &key &allow-other-keys)
   (unless (mode-whitespace-elements mode)
@@ -42,6 +45,11 @@
 (defun element-allowed-p (mode tagname)
   (member tagname
           (mode-elements mode)
+          :test #'string-equal))
+
+(defun element-removed-p (mode tagname)
+  (member tagname
+          (mode-remove-elements mode)
           :test #'string-equal))
 
 (defun attribute-allowed-p (mode tagname attrname)
@@ -73,7 +81,8 @@
 ;;;; define-sanitize-mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defmacro define-sanitize-mode (name &key allow-comments add-attributes attributes elements protocols whitespace-elements)
+(defmacro define-sanitize-mode (name &key allow-comments add-attributes attributes elements
+                                          protocols whitespace-elements remove-elements)
   `(defparameter ,name
      (make-instance 'sanitize-mode
                     :allow-comments ',allow-comments
@@ -81,9 +90,7 @@
                     :attributes ',attributes
                     :elements ',elements
                     :protocols ',protocols
-                    :whitespace-elements ',whitespace-elements)))
+                    :whitespace-elements ',whitespace-elements
+                    :remove-elements ',remove-elements)))
 
 (define-sanitize-mode +default+)
-
-
- 
