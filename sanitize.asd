@@ -21,7 +21,7 @@
                                   :depends-on ("mode"))))))
 
 (defsystem #:sanitize-test
-  :depends-on (#:sanitize #:eos)
+  :depends-on (#:sanitize #:fiveam)
   :components ((:module "t"
                         :components
                         ((:file "suite")))))

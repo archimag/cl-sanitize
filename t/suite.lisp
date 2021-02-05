@@ -7,7 +7,7 @@
 
 
 (defpackage #:sanitize.test
-  (:use #:cl #:sanitize #:eos)
+  (:use #:cl #:sanitize #:fiveam)
   (:export #:run-sanitize-test))
 
 (in-package #:sanitize.test)
@@ -16,7 +16,7 @@
     :description "Sanitize tests suite")
 
 (defun run-sanitize-test ()
-  (eos:run! 'sanitize))
+  (fiveam:run! 'sanitize))
 
 (defmethod asdf:perform ((op asdf:test-op) (system (eql (asdf:find-system '#:sanitize-test))))
   (run-sanitize-test))
